@@ -1,0 +1,31 @@
+@host = https://localhost:7320
+
+### POC 1 - Reset 20 Orders
+POST {{host}}/api/orders/setup-correctness
+
+### POC 1 - Offset page 1 -> 1..5
+GET {{host}}/api/orders/offset?page=1&pageSize=5
+
+### POC 1 - Delete a row already seen
+DELETE {{host}}/api/orders/3
+
+### POC 1 - Offset page 2 -> 7..11; Order 6 is skipped
+GET {{host}}/api/orders/offset?page=2&pageSize=5
+
+### Reset before Keyset scenario
+POST {{host}}/api/orders/setup-correctness
+
+### POC 1 - Keyset first page -> 1..5; cursor 5
+GET {{host}}/api/orders/keyset?lastId=0&pageSize=5
+
+### Same concurrent change
+DELETE {{host}}/api/orders/3
+
+### POC 1 - Keyset next page -> 6..10
+GET {{host}}/api/orders/keyset?lastId=5&pageSize=5
+
+### POC 2 - after running setup-performance.sql
+GET {{host}}/api/orders/performance/offset?page=50000&pageSize=20
+
+### Same 20 rows with Keyset
+GET {{host}}/api/orders/performance/keyset?lastId=999980&pageSize=20
